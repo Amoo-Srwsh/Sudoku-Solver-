@@ -1,81 +1,81 @@
+// Sun 02 Jan 2022 09:40:15 AM EST
 #include <iostream>
-#define N 9
 using namespace std;
-int grid[N][N] = {
-   {5, 3, 0, 0, 7, 0, 0, 0, 0},
-   {6, 0, 0, 1, 9, 5, 0, 0, 0},
-   {0, 9, 8, 0, 0, 0, 0, 6, 0},
-   {8, 0, 0, 0, 6, 0, 0, 0, 3},
-   {4, 0, 0, 8, 0, 3, 0, 0, 1},
-   {7, 0, 0, 0, 2, 0, 0, 0, 6},
-   {0, 6, 0, 0, 0, 0, 2, 8, 0},
-   {0, 0, 0, 4, 1, 9, 0, 0, 5},
-   {0, 0, 0, 0, 8, 0, 0, 0, 9}
-};
-bool isPresentInCol(int col, int num){ //check whether num is present in col or not
-   for (int row = 0; row < N; row++)
-      if (grid[row][col] == num)
-         return true;
-   return false;
+
+#define TRUE 1
+#define FALSE 0
+
+int map[ 9 ][ 9 ];
+
+void draw_map ()
+{
+	for ( int i = 0; i < 9; i++ ) {
+
+		for ( int j = 0; j < 9; j++ )
+			cout << map[ i ][ j ] << " ";
+		cout << "\n";
+
+	}
+
 }
-bool isPresentInRow(int row, int num){ //check whether num is present in row or not
-   for (int col = 0; col < N; col++)
-      if (grid[row][col] == num)
-         return true;
-   return false;
+
+char find_free ( int &x, int &y )
+{
+	for ( int i = 0; i < 9; i++ )
+		for ( int j = 0; j < 9; j++ )
+			if ( map[ i ][ j ] == 0 ) {
+
+				x = i; 
+				y = j;
+				return 0;
+			
+			}
+	return 1;
 }
-bool isPresentInBox(int boxStartRow, int boxStartCol, int num){
-//check whether num is present in 3x3 box or not
-   for (int row = 0; row < 3; row++)
-      for (int col = 0; col < 3; col++)
-         if (grid[row+boxStartRow][col+boxStartCol] == num)
-            return true;
-   return false;
+
+char is_valid ( int n, int x, int y )
+{
+	   	for ( int i = 0; i < 9; i++ )
+			if ( map[ x ][ i ] == n || map[ i ][ y ] == n )
+				return 0;
+
+		int x_location = ( x / 3 ) * 3;
+		int y_location = ( y / 3 ) * 3;
+
+		for ( int i = x_location; i < x_location + 3; i++ )
+			for ( int j = y_location; j < y_location + 3; j++ )
+				if ( map[ i ][ j ] == n )
+					return 0;
+
+		return 1;
 }
-void sudokuGrid(){ //print the sudoku grid after solve
-   for (int row = 0; row < N; row++){
-      for (int col = 0; col < N; col++){
-         if(col == 3 || col == 6)
-            cout << " | ";
-         cout << grid[row][col] <<" ";
-      }
-      if(row == 2 || row == 5){
-         cout << endl;
-         for(int i = 0; i<N; i++)
-            cout << "---";
-      }
-      cout << endl;
-   }
+
+int solve ()
+{
+	int x, y;
+	if ( find_free ( x , y ) )
+		return 1;
+
+	for ( int i = 1; i <= 9; i++ ) {
+		if ( is_valid( i , x , y ) ) {
+			map[ x ][ y ] = i;
+			if ( solve() )
+				return 1;
+			map[ x ][ y ] = 0;
+		}
+	}
+
+	return 0;
 }
-bool findEmptyPlace(int &row, int &col){ //get empty location and update row and column
-   for (row = 0; row < N; row++)
-      for (col = 0; col < N; col++)
-         if (grid[row][col] == 0) //marked with 0 is empty
-            return true;
-   return false;
-}
-bool isValidPlace(int row, int col, int num){
-   //when item not found in col, row and current 3x3 box
-   return !isPresentInRow(row, num) && !isPresentInCol(col, num) && !isPresentInBox(row - row%3 ,
-col - col%3, num);
-}
-bool solveSudoku(){
-   int row, col;
-   if (!findEmptyPlace(row, col))
-      return true; //when all places are filled
-   for (int num = 1; num <= 9; num++){ //valid numbers are 1 - 9
-      if (isValidPlace(row, col, num)){ //check validation, if yes, put the number in the grid
-         grid[row][col] = num;
-         if (solveSudoku()) //recursively go for other rooms in the grid
-            return true;
-         grid[row][col] = 0; //turn to unassigned space when conditions are not satisfied
-      }
-   }
-   return false;
-}
-int main(){
-   if (solveSudoku() == true)
-      sudokuGrid();
-   else
-      cout << "No solution exists";
+		
+int main()
+{
+	for ( int i = 0; i < 9; i++ )
+		for ( int j = 0; j < 9; j++ )
+			cin >> map[ i ][ j ];
+
+	if ( solve() )
+		draw_map();
+
+	return EXIT_SUCCESS;
 }
