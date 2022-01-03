@@ -27,17 +27,17 @@ char find_free ( int &x, int &y )
 
 				x = i; 
 				y = j;
-				return 0;
+				return FALSE;
 			
 			}
-	return 1;
+	return TRUE;
 }
 
-char is_valid ( int n, int x, int y )
+int is_valid ( int n, int x, int y )
 {
 	   	for ( int i = 0; i < 9; i++ )
 			if ( map[ x ][ i ] == n || map[ i ][ y ] == n )
-				return 0;
+				return FALSE;
 
 		int x_location = ( x / 3 ) * 3;
 		int y_location = ( y / 3 ) * 3;
@@ -45,27 +45,27 @@ char is_valid ( int n, int x, int y )
 		for ( int i = x_location; i < x_location + 3; i++ )
 			for ( int j = y_location; j < y_location + 3; j++ )
 				if ( map[ i ][ j ] == n )
-					return 0;
+					return FALSE;
 
-		return 1;
+		return TRUE;
 }
 
 int solve ()
 {
 	int x, y;
 	if ( find_free ( x , y ) )
-		return 1;
+		return TRUE;
 
 	for ( int i = 1; i <= 9; i++ ) {
 		if ( is_valid( i , x , y ) ) {
 			map[ x ][ y ] = i;
 			if ( solve() )
-				return 1;
+				return TRUE;
 			map[ x ][ y ] = 0;
 		}
 	}
 
-	return 0;
+	return FALSE;
 }
 		
 int main()
